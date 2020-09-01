@@ -227,7 +227,7 @@ tab2_display_text.grid(row=7, column=0, columnspan=3, padx=5, pady=5)
 
 about_label = Label(tab3, text="NLPText, V0.0.2 \n Luis Ramos @luisramos1977", padx=5, pady=5)
 about_label.grid(column=0, row=1)
-
+#test
 #**********END***********
 window.mainloop()
 
