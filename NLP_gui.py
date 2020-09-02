@@ -36,7 +36,6 @@ tab_control.add(tab3,text="About")
 tab_control.pack(expand=1, fill='both')
 
 #tab for nlp tool
-
 label1 = Label(tab1, text="NLP Made Simple", padx=5,pady=5)
 label1.grid(row=0,column=0)
 label2 = Label(tab2, text="File Processing", padx=5,pady=5)
@@ -97,12 +96,15 @@ def clear_display_result():
 l1 = Label(tab1,text="Enter Text to Analysis")
 l1.grid(row=1,column=0)
 
-raw_entry = StringVar()
+
+raw_entry = StringVar()#reading text
 entry1 = Entry(tab1,textvariable=raw_entry,width=50)
 entry1.grid(row=1,column=1)#get width of main, and adjust according to size, that would be more interesting
 
+
+
 #buttons
-button1 = Button(tab1, text='Tokenize',width=12,bg='#03A9F4', fg='#FFF', command=get_tokens)
+button1 = Button(tab1, text='Tokenize',width=12,bg='#03A9F4', fg='#FFF', command=get_tokens(tab1_display))
 button1.grid(row=4,column=0, padx=10, pady=10)
 
 button2 = Button(tab1, text='POS Tagger',width=12,bg='#03A9F4', fg='#FFF', command=get_pos_tags)
@@ -227,6 +229,11 @@ tab2_display_text.grid(row=7, column=0, columnspan=3, padx=5, pady=5)
 
 about_label = Label(tab3, text="NLPText, V0.0.2 \n Luis Ramos @luisramos1977", padx=5, pady=5)
 about_label.grid(column=0, row=1)
+
+#creating the class with all parameter, a class button wit nltk specific functions
+
+
+
 #test
 #**********END***********
 window.mainloop()
