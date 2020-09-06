@@ -3,25 +3,52 @@ from tkinter import *
 from tkinter import ttk
 from tkinter import filedialog
 from tkinter.scrolledtext import *
-
-
-
+from nltk.tokenize import PunktSentenceTokenizer
+from nltk import word_tokenize, pos_tag, ne_chunk
+from nltk.chunk import tree2conlltags
+from tkinter import Tk, Text, BOTH, W, N, E, S
+import numpy as np
 #import spacy
 import nltk
-
-
+nltk.download('maxent_ne_chunker')
+nltk.download('words')
 #create nlp
-
-#nlp =spacy.load('en')#second option ----   import spacy nlp = spacy.load('en')
-
 #NLP packages
 from textblob import TextBlob
-
-
 window = Tk()
 window.title("NLP Tool V0.0.2")
-window.geometry("700x400")
+window.attributes("-fullscreen", TRUE)
+#create a general menu
+# create a toplevel menu
+menubar = Menu(window)
+file = Menu(menubar, tearoff=0)#create file menu
+file.add_command(label="New")
+file.add_command(label="Open")
+file.add_command(label="Save")
+file.add_command(label="Save as...")
+file.add_command(label="Close")
+file.add_separator()
+file.add_command(label="Exit", command=window.quit)
+menubar.add_cascade(label="File", menu=file)#add menu file with label
+#********** edit menu
+edit = Menu(menubar, tearoff=0)
+edit.add_command(label="Undo")
+edit.add_separator()
+edit.add_command(label="Cut")
+edit.add_command(label="Copy")
+edit.add_command(label="Paste")
+edit.add_command(label="Delete")
+edit.add_command(label="Select All")
+menubar.add_cascade(label="Edit", menu=edit)
+config = Menu(menubar, tearoff=0)
+config.add_checkbutton(label="nltk")
+config.add_checkbutton(label="spacy")
+config.add_checkbutton(label="elastic search")
 
+
+menubar.add_cascade(label="Config", menu=config)
+# display the menu
+window.config(menu=menubar)
 #tab layout
 
 tab_control = ttk.Notebook(window)
@@ -45,41 +72,57 @@ label3.grid(row=0,column=0)
 
 #functions for nlptool
 
+
 #get tokens
-def get_tokens():
-    raw_text = str(raw_entry.get())
+def get_tokens(aText, aTabDisplay, use_ner):
+    #messagebox.showinfo("Button label", text.get());
+    raw_text = str(aText.get())
     new_text = TextBlob(raw_text)
     final_text = new_text.words
-    result = '\nTokens: {}'.format(final_text)
-    #Inserting into display   *****not recommended
-    tab1_display.insert(tk.END,result)
+    result = format(final_text)#'\nTokens: {}'.format(final_text)
+    if use_ner:
+        return result
+    else:
+        aTabDisplay.insert(tk.END, result)
 
-def get_pos_tags():
-    raw_text = str(raw_entry.get())
+
+def get_pos_tags(aText, aTabDisplay, use_ner):
+    raw_text = str(aText.get())
     new_text = TextBlob(raw_text)
     final_text = new_text.tags
-    result = '\nPOS of Speech : {}'.format(final_text)
+    result = format(final_text)
     # Inserting into display   *****not recommended
-    tab1_display.insert(tk.END, result)
+    if use_ner:
+        return result
+    else:
+        aTabDisplay.insert(tk.END, result)
 
 
 #get sentiments
-def get_sentiments():
-    raw_text = str(raw_entry.get())
+def get_sentiments(aText, aTabDisplay, use_ner):
+    raw_text = str(aText.get())
     new_text = TextBlob(raw_text)
     final_text = new_text.sentiment
     result = '\nSubjectivity: {}, Polarity{}'.format(new_text.sentiment.subjectivity, new_text.sentiment.polarity)
     # Inserting into display   *****not recommended
-    tab1_display.insert(tk.END, result)
+    if use_ner:
+        return result
+    else:
+        aTabDisplay.insert(tk.END, result)
 
 
-#get entities
+#get entities, needs previous
 
-#def get_entities():
- #   raw_text = str(raw_entry.get())
-  #  docx = nlp(raw_text)
-   # final_text = [(entity.text, entity.label) for entity in docx.ents ]
-    #result = '\nEntities: {}'.format(final_text)
+def get_entities(aText, aTabDisplay, user_ner):
+    sentence = aText.get()
+    word = nltk.word_tokenize(sentence)
+    print(word)
+    pos_tag = nltk.pos_tag(word)
+    print(pos_tag)
+    chunk = nltk.ne_chunk(pos_tag)
+    print(chunk)
+    aTabDisplay.insert(tk.END, chunk)
+
     # Inserting into display   *****not recommended
     #tab1_display.insert(tk.END, result)
 
@@ -102,30 +145,74 @@ entry1 = Entry(tab1,textvariable=raw_entry,width=50)
 entry1.grid(row=1,column=1)#get width of main, and adjust according to size, that would be more interesting
 
 
-
-#buttons
-button1 = Button(tab1, text='Tokenize',width=12,bg='#03A9F4', fg='#FFF', command=get_tokens(tab1_display))
-button1.grid(row=4,column=0, padx=10, pady=10)
-
-button2 = Button(tab1, text='POS Tagger',width=12,bg='#03A9F4', fg='#FFF', command=get_pos_tags)
-button2.grid(row=4,column=1, padx=10, pady=10)
-
-button3 = Button(tab1, text='Sentiment',width=12,bg='#03A9F4', fg='#FFF', command=get_sentiments)
-button3.grid(row=4,column=2, padx=10, pady=10)
-
-button4 = Button(tab1, text='Entities',width=12,bg='#03A9F4', fg='#FFF', command=get_tokens)
-button4.grid(row=5,column=0, padx=10, pady=10)
-
-button5 = Button(tab1, text='Reset',width=12,bg='#03A9F4', fg='#FFF', command=reset_entry_text)
-button5.grid(row=5,column=1, padx=10, pady=10)
-
-button6 = Button(tab1, text='Clear Result',width=12,bg='#03A9F4', fg='#FFF', command=clear_display_result)
-button6.grid(row=5,column=2, padx=10, pady=10)
-
 #display screen for results
 
 tab1_display = ScrolledText(tab1, height=10)
 tab1_display.grid(row=7, column=0, columnspan = 3, padx = 5, pady=5)
+
+#buttons
+#button1 = Button(tab1, text='Tokenize',width=12,bg='#03A9F4', fg='#FFF', command=get_tokens)
+button1 = Button(tab1, text="Tokenizer", width=12, bg='#03A9F4',fg='#FFF',
+                 command=lambda: get_tokens(entry1, tab1_display, False))
+button1.grid(row=2,column=0, padx=10, pady=10)
+
+button2 = Button(tab1, text='POS Tagger',width=12,bg='#03A9F4', fg='#FFF',
+                 command=lambda: get_pos_tags(entry1, tab1_display, False))
+button2.grid(row=2,column=1, padx=10, pady=10)
+
+button3 = Button(tab1, text='Sentiment',width=12,bg='#03A9F4', fg='#FFF',
+                 command = lambda : get_sentiments(entry1, tab1_display, False))
+button3.grid(row=2,column=2, padx=10, pady=10)
+
+button4 = Button(tab1, text='Entities',width=12,bg='#03A9F4', fg='#FFF', command = lambda :get_entities(entry1, tab1_display, True))
+button4.grid(row=3,column=0, padx=10, pady=10)
+
+button5 = Button(tab1, text='Reset',width=12,bg='#03A9F4', fg='#FFF', command=reset_entry_text)
+button5.grid(row=3,column=1, padx=10, pady=10)
+
+button6 = Button(tab1, text='Clear Result',width=12,bg='#03A9F4', fg='#FFF', command=clear_display_result)
+button6.grid(row=3,column=2, padx=10, pady=10)
+
+#frame for checkbutton
+#iframe1 = Frame(tab1, width=100, height=110)
+
+#iframe1.grid(row=8,column=0, padx=10, pady=10)
+#frame for the buttons
+# Tab 1
+Pipeline = ttk.LabelFrame(tab1, text=' Pipeline ')
+Pipeline.grid(column=4, row=0, columnspan=4, rowspan=5, padx=8, pady=4, sticky='nsew')
+tk.Grid.rowconfigure(Pipeline, 0, weight=1)
+tk.Grid.columnconfigure(Pipeline, 0, weight=1)
+ttk.Label(Pipeline).grid(column=4, row=0)
+
+#check button for pipeline
+
+CheckVar1 = IntVar()
+CheckVar2 = IntVar()
+CheckVar3 = IntVar()
+CheckVar4 = IntVar()
+
+checkbutton1 =Checkbutton(Pipeline, text = "Tokenizer                         ", variable = CheckVar1,
+                 onvalue = 1, offvalue = 0, height=1,
+                 width = 20)
+checkbutton1.grid(row=0,column=4, sticky= W)
+
+checkbutton2 =Checkbutton(Pipeline, text = "Part of Speech (POS) Tagger", variable = CheckVar2,
+                 onvalue = 1, offvalue = 0, height=1,
+                 width = 20)
+checkbutton2.grid(row=1,column=4, padx=10, pady=10)
+
+checkbutton3 =Checkbutton(Pipeline, text = "Sentiment Analisys               ", variable = CheckVar3,
+                 onvalue = 1, offvalue = 0, height=1,
+                 width = 20)
+checkbutton3.grid(row=2,column=4, padx=10, pady=10)
+
+checkbutton4 =Checkbutton(Pipeline, text = "Name Entity Recognition    ", variable = CheckVar4,
+                 onvalue = 1, offvalue = 0, height=1,
+                 width = 20)
+checkbutton4.grid(row=3,column=4, padx=10, pady=10)
+
+
 
 #file reading and processing in tab 2
 #function for opening files
