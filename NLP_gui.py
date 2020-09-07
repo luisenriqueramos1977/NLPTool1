@@ -113,14 +113,22 @@ def get_sentiments(aText, aTabDisplay, use_ner):
 
 #get entities, needs previous
 
-def get_entities(aText, aTabDisplay, user_ner):
-    sentence = aText.get()
-    word = nltk.word_tokenize(sentence)
-    print(word)
-    pos_tag = nltk.pos_tag(word)
-    print(pos_tag)
-    chunk = nltk.ne_chunk(pos_tag)
-    print(chunk)
+def get_entities(aText, aTabDisplay, aList):
+    aVar = aList.__getitem__(0)
+    if aVar.get():#getting a token
+        sentence = aText.get()
+        word = nltk.word_tokenize(sentence)
+        print(word)
+        aTabDisplay.insert(tk.END, word)
+    aVar = aList.__getitem__(1)
+    if aVar.get():  # getting pos
+        pos_tag = nltk.pos_tag(word)
+        print(pos_tag)
+        aTabDisplay.insert(tk.END, pos_tag)
+    aVar = aList.__getitem__(3)
+    if aVar.get():  # getting pos
+        chunk = nltk.ne_chunk(pos_tag)
+        print(chunk)
     aTabDisplay.insert(tk.END, chunk)
 
     # Inserting into display   *****not recommended
@@ -211,6 +219,12 @@ checkbutton4 =Checkbutton(Pipeline, text = "Name Entity Recognition    ", variab
                  onvalue = 1, offvalue = 0, height=1,
                  width = 20)
 checkbutton4.grid(row=3,column=4, padx=10, pady=10)
+
+checkbuttons_list = [CheckVar1, CheckVar2,CheckVar3, CheckVar4]
+
+button7 = Button(Pipeline, text="Process Pipeline", width=12, bg='#03A9F4',fg='#FFF',
+                 command=lambda: get_entities(entry1, tab1_display, checkbuttons_list))
+button7.grid(row=4,column=4, padx=10, pady=10)
 
 
 
