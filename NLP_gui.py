@@ -1,3 +1,4 @@
+import os
 import tkinter as tk
 from tkinter import *
 from tkinter import ttk
@@ -6,8 +7,11 @@ from tkinter.scrolledtext import *
 from nltk.tokenize import PunktSentenceTokenizer
 from nltk import word_tokenize, pos_tag, ne_chunk
 from nltk.chunk import tree2conlltags
+from nltk.corpus import treebank
 from tkinter import Tk, Text, BOTH, W, N, E, S
 import numpy as np
+from IPython.display import Image
+
 #import spacy
 import nltk
 nltk.download('maxent_ne_chunker')
@@ -17,9 +21,13 @@ nltk.download('words')
 from textblob import TextBlob
 window = Tk()
 window.title("NLP Tool V0.0.2")
-window.attributes("-fullscreen", TRUE)
+window.resizable(height = None, width = None)
+
+#window.attributes("-fullscreen", TRUE)
 #create a general menu
 # create a toplevel menu
+
+
 menubar = Menu(window)
 file = Menu(menubar, tearoff=0)#create file menu
 file.add_command(label="New")
@@ -129,9 +137,18 @@ def get_entities(aText, aTabDisplay, aList):
     if aVar.get():  # getting pos
         chunk = nltk.ne_chunk(pos_tag)
         print(chunk)
-    aTabDisplay.insert(tk.END, chunk)
+        aTabDisplay.insert(tk.END, chunk)
+    aVar = aList.__getitem__(4)
+    if aVar.get():
+        chunkGram = r"""Chunk: {<RB.?>*<VB.?>*<NNP>+<NN>?}"""
+        chunkParser = nltk.RegexpParser(chunkGram)
+        chunked = chunkParser.parse(pos_tag)
+        chunked.draw()
+        #nltk.draw.tree.TreeView(chunk)._cframe.print_to_file('output.ps')
+        #os.system('convert output.ps output.png')
+        #Image(filename='output.png')
 
-    # Inserting into display   *****not recommended
+        # Inserting into display   *****not recommended
     #tab1_display.insert(tk.END, result)
 
 #cleaning text screen in tab1
@@ -188,7 +205,7 @@ button6.grid(row=3,column=2, padx=10, pady=10)
 #frame for the buttons
 # Tab 1
 Pipeline = ttk.LabelFrame(tab1, text=' Pipeline ')
-Pipeline.grid(column=4, row=0, columnspan=4, rowspan=5, padx=8, pady=4, sticky='nsew')
+Pipeline.grid(column=4, row=0, columnspan=4, rowspan=6, padx=8, pady=4, sticky='nsew')
 tk.Grid.rowconfigure(Pipeline, 0, weight=1)
 tk.Grid.columnconfigure(Pipeline, 0, weight=1)
 ttk.Label(Pipeline).grid(column=4, row=0)
@@ -199,6 +216,8 @@ CheckVar1 = IntVar()
 CheckVar2 = IntVar()
 CheckVar3 = IntVar()
 CheckVar4 = IntVar()
+CheckVar5 = IntVar()
+
 
 checkbutton1 =Checkbutton(Pipeline, text = "Tokenizer                         ", variable = CheckVar1,
                  onvalue = 1, offvalue = 0, height=1,
@@ -220,11 +239,17 @@ checkbutton4 =Checkbutton(Pipeline, text = "Name Entity Recognition    ", variab
                  width = 20)
 checkbutton4.grid(row=3,column=4, padx=10, pady=10)
 
-checkbuttons_list = [CheckVar1, CheckVar2,CheckVar3, CheckVar4]
+checkbutton5 =Checkbutton(Pipeline, text = "Treebank Graph                    ", variable = CheckVar5,
+                 onvalue = 1, offvalue = 0, height=1,
+                 width = 20)
+checkbutton5.grid(row=4,column=4, padx=10, pady=10)
+
+
+checkbuttons_list = [CheckVar1, CheckVar2,CheckVar3, CheckVar4, CheckVar5]
 
 button7 = Button(Pipeline, text="Process Pipeline", width=12, bg='#03A9F4',fg='#FFF',
                  command=lambda: get_entities(entry1, tab1_display, checkbuttons_list))
-button7.grid(row=4,column=4, padx=10, pady=10)
+button7.grid(row=5,column=4, padx=10, pady=10)
 
 
 
