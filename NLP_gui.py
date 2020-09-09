@@ -14,8 +14,11 @@ from IPython.display import Image
 
 #import spacy
 import nltk
-nltk.download('maxent_ne_chunker')
-nltk.download('words')
+from nltk.tokenize import sent_tokenize
+
+#nltk.download('maxent_ne_chunker')
+#nltk.download('words')
+nltk.download('wordnet')
 #create nlp
 #NLP packages
 from textblob import TextBlob
@@ -52,6 +55,8 @@ config = Menu(menubar, tearoff=0)
 config.add_checkbutton(label="nltk")
 config.add_checkbutton(label="spacy")
 config.add_checkbutton(label="elastic search")
+config.add_separator()
+config.add_command(label="NLP Language")
 
 
 menubar.add_cascade(label="Config", menu=config)
@@ -124,13 +129,22 @@ def get_sentiments(aText, aTabDisplay, use_ner):
 def get_entities(aText, aTabDisplay, aList):
     aVar = aList.__getitem__(0)
     if aVar.get():#getting a token
-        sentence = aText.get()
-        word = nltk.word_tokenize(sentence)
-        print(word)
-        aTabDisplay.insert(tk.END, word)
+        thisText = str(aText.get())
+        #print(thisText)
+        sentences = sent_tokenize(thisText)
+        #initialize list
+        tok_sentence = []
+        for sentence in sentences:
+            #print(sentence)
+            words = nltk.word_tokenize(sentence)
+            for word in words:
+                tok_sentence.append(word)
+            #print(words)
+        #print(tok_sentence)
+        aTabDisplay.insert(tk.END, tok_sentence)
     aVar = aList.__getitem__(1)
     if aVar.get():  # getting pos
-        pos_tag = nltk.pos_tag(word)
+        pos_tag = nltk.pos_tag(tok_sentence)
         print(pos_tag)
         aTabDisplay.insert(tk.END, pos_tag)
     aVar = aList.__getitem__(3)
